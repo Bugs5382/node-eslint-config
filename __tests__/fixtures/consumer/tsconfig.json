@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "strict": true, "module": "nodenext", "target": "es2022", "jsx": "react-jsx", "skipLibCheck": true },
+  "include": ["src", "__tests__"]
+}

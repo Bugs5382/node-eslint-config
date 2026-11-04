@@ -45,12 +45,11 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  Build:
-    name: 🧪 Build
+  Test:
+    name: 🧪 Test
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
-    # Three Node versions: install, test, build and lint each take a few
-    # minutes.
+    # Three Node versions: install, test and lint each take a few minutes.
     timeout-minutes: 20
     strategy:
       matrix:
@@ -75,63 +74,22 @@ jobs:
         run: |
           npm test
 
-      - name: Run Build
-        run: |
-          npm run build
-
-      # eslint.config.mjs lints this repo with its own built config
-      # (./lib/esm/index.mjs), so on a fresh checkout ESLint cannot load
-      # until the build has run.
+      # The repo lints and formats itself with its own configs.
       - name: Lint
         run: npm run lint
 
-      - name: Upload build artifact
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Upload package artifact
         if: matrix.node-version == 'lts/*'
         uses: actions/upload-artifact@v7
         with:
-          name: lib
+          name: package
           path: |
             package.json
             package-lock.json
             README.md
             LICENSE
             CHANGELOG.md
-            ./lib
-
-  # Run the suite against each eslint major the package advertises in its peer
-  # range. The integration tests load the config through createESLintConfig and
-  # run real ESLint, so a bundled plugin that drops support for one major fails
-  # at config-load time here instead of shipping (regression guard for #51).
-  ESLintCompat:
-    name: 🧩 ESLint ${{ matrix.eslint }}.x
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        eslint: ['9', '10']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Generate lockfile
-        run: npm install --package-lock-only --ignore-scripts --legacy-peer-deps
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts --legacy-peer-deps
-
-      - name: Pin eslint ${{ matrix.eslint }}.x
-        run: npm install --no-save --ignore-scripts --legacy-peer-deps "eslint@${{ matrix.eslint }}"
-
-      - name: Show resolved eslint version
-        run: npx eslint --version
-
-      - name: Run tests against eslint ${{ matrix.eslint }}.x
-        run: npm test
+            ./configs

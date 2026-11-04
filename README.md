@@ -1,161 +1,147 @@
-# ESLint Config 🧹
+# node-eslint-config 🧹
 
-> 🪄 A shared ESLint configuration used across Bugs5382 projects.
+> 🪄 Shared Oxlint and oxfmt configs used across Bugs5382 projects.
 
-![npm version](https://img.shields.io/npm/v/@bugs5382/eslint-config?style=for-the-badge&logo=npm&label=version)
-![npm downloads](https://img.shields.io/npm/dm/@bugs5382/eslint-config?style=for-the-badge&logo=npm&label=downloads)
-![ESLint](https://img.shields.io/badge/ESLint-9.x%20%7C%2010.x-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![npm version](https://img.shields.io/npm/v/@bugs5382/node-eslint-config?style=for-the-badge&logo=npm&label=version)
+![npm downloads](https://img.shields.io/npm/dm/@bugs5382/node-eslint-config?style=for-the-badge&logo=npm&label=downloads)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 ## ✨ Overview
 
-This package provides a **shared ESLint configuration** used across
-[`@Bugs5382`](https://github.com/Bugs5382) projects.
+This package holds the lint rules and formatting every
+[`@Bugs5382`](https://github.com/Bugs5382) JavaScript and TypeScript project uses. Linting runs on
+[Oxlint](https://oxc.rs/docs/guide/usage/linter) and formatting on
+[oxfmt](https://oxc.rs/docs/guide/usage/formatter), both from the Oxc project and both much faster
+than ESLint and Prettier. You can use it in your own projects too.
 
-It is designed to be:
-- 🛠 **Reusable** – a single config for all JS/TS projects
-- 📦 **Pluggable** – easy to extend if needed
-- 🌍 **Publicly available** – you can use it in your own projects too!
+- ⚡ **Oxlint, with nothing lost:** every rule the old ESLint config enforced still runs, natively
+  where Oxlint has the rule and through its ESLint plugin support where it doesn't
+  ([RULES.md](RULES.md)).
+- 🎨 **Prettier's output, from oxfmt:** the formatter settings print what Prettier 3 printed with its
+  defaults, so switching doesn't reformat your code.
+- 🧩 **Opt-ins:** accessibility, Testing Library, Storybook and TypeDoc rules, each its own config.
 
 ## 📦 Installation
 
 ```bash
-# with npm
-npm install --save-dev eslint @bugs5382/eslint-config
-
-# with yarn
-yarn add -D eslint @bugs5382/eslint-config
-
-# with pnpm
-pnpm add -D eslint @bugs5382/eslint-config
+npm install --save-dev @bugs5382/node-eslint-config oxlint oxlint-tsgolint oxfmt
 ```
 
-### Moving from @the-rabbit-hole/eslint-config
-
-This package replaces `@the-rabbit-hole/eslint-config`, which is deprecated. Remove the old
-package and install this one — the public API (`createESLintConfig`, the default export, and
-`globalIgnoresArray`) is unchanged, so only the package name and import specifier need to update:
-
-```bash
-npm uninstall @the-rabbit-hole/eslint-config
-npm install --save-dev @bugs5382/eslint-config
-```
-
-```diff
-- import eslintConfig from "@the-rabbit-hole/eslint-config";
-+ import eslintConfig from "@bugs5382/eslint-config";
-```
+`oxlint-tsgolint` runs the type-aware TypeScript rules, which the base config turns on.
 
 ## ⚙️ Usage
 
-In your `eslint.config.js` (or `eslint.config.mjs`):
+### Linting
 
-```js
-import eslintConfig from "@bugs5382/eslint-config";
-export default eslintConfig;
+Create `.oxlintrc.json`, extend the base config, and list what Oxlint should skip:
+
+```json
+{
+  "extends": ["./node_modules/@bugs5382/node-eslint-config/configs/base.json"],
+  "ignorePatterns": [
+    "dist/**",
+    "lib/**",
+    "coverage/**",
+    "docs/**",
+    "storybook-static/**",
+    ".storybook/**"
+  ]
+}
 ```
 
-That’s it! 🚀
+The ignore patterns belong in your own file: Oxlint reads patterns in an extended config relative to
+that config, so shared ones wouldn't match your repo. Oxlint also skips whatever `.gitignore`
+lists, `node_modules` included.
 
-In a CommonJS config (`eslint.config.cjs`), `require` works the same way:
+Add any opt-ins after it:
 
-```js
-const { createESLintConfig } = require("@bugs5382/eslint-config");
-module.exports = createESLintConfig();
+| Config                   | What it adds                                  |
+| ------------------------ | --------------------------------------------- |
+| `configs/a11y.json`      | jsx-a11y rules for React UI                   |
+| `configs/testing.json`   | Testing Library rules on test and story files |
+| `configs/storybook.json` | Storybook rules on story files                |
+| `configs/typedoc.json`   | TypeDoc rules for documented public APIs      |
+
+A React project should also tell the React rules its version:
+
+```json
+{
+  "extends": [
+    "./node_modules/@bugs5382/node-eslint-config/configs/base.json",
+    "./node_modules/@bugs5382/node-eslint-config/configs/a11y.json"
+  ],
+  "settings": { "react": { "version": "19.2" } }
+}
 ```
 
-Some bundled plugins ship as ES modules only, so CommonJS loading needs a Node.js release that can `require()` ES modules (20.19+, 22.12+ or 24+). ESLint 10 already requires one of those.
+Your own `rules`, `overrides` and `ignorePatterns` go in the same file and win over the shared ones.
 
-### Customizing
+### Formatting
 
-Use the named `createESLintConfig` factory to disable bundled extends, add new rules, or override the package's defaults:
+Create `oxfmt.config.ts`:
 
-```js
-import { createESLintConfig } from "@bugs5382/eslint-config";
-
-export default createESLintConfig({
-  // Drop default-on extends you don't want
-  disableExtends: ["eslintReact"],
-
-  // Turn on opt-in extends that are off by default
-  enable: ["eslintA11y", "eslintTypedoc"],
-
-  // Add your own rules — or override bundled ones
-  rules: {
-    "no-console": "error",                // additive — applied as-is
-    "react/react-in-jsx-scope": "warn",   // overrides the bundled default
-  },
-});
+```ts
+export { default } from "@bugs5382/node-eslint-config/oxfmt";
 ```
 
-All options are independent — pass any combination, or none.
+To change a setting, spread the shared one:
 
-#### Override notifications
+```ts
+import shared from "@bugs5382/node-eslint-config/oxfmt";
 
-If a key in `rules` matches a rule the package sets by default, an info line is printed when ESLint loads the config so the override is visible:
-
-```
-[@bugs5382/eslint-config] Rule "react/react-in-jsx-scope" overrides the bundled default.
+export default { ...shared, printWidth: 100 };
 ```
 
-Adding rules the package does not set is silent — no message.
+The shared settings leave alone the files the project-template governance sync owns (`.github/`,
+`.claude/`, `.gitleaks.toml`, the Taskfile) and the generated `CHANGELOG.md`.
 
-#### Available `disableExtends` keys (default-on extends)
+### Scripts
 
-`eslintPerfectionist` · `eslintPrettier` · `eslintReact` · `eslintTypescript` · `eslintUnicorn`
-
-#### Opt-in extends (`enable`)
-
-These are **off by default** and only applied when named in `enable`. They target a specific kind of project rather than every consumer, so a plain Node library never inherits rules it has no use for:
-
-* `eslintA11y` — JSX accessibility rules ([eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y)), for React component code.
-* `eslintStorybook` — Storybook story linting ([eslint-plugin-storybook](https://github.com/storybookjs/eslint-plugin-storybook)).
-* `eslintTesting` — Testing Library rules ([eslint-plugin-testing-library](https://github.com/testing-library/eslint-plugin-testing-library)), for test files.
-* `eslintTypedoc` — [TypeDoc](https://typedoc.org)/TSDoc documentation quality ([eslint-plugin-typedoc](https://github.com/Nick2bad4u/eslint-plugin-typedoc)): doc-comment coverage on exported APIs (`typedoc/require-exported-doc-comment`) plus tag correctness (unknown/duplicate/empty tags, malformed inline links). Scoped to `**/*.{ts,tsx,mts,cts}`.
-
-```js
-import { createESLintConfig } from "@bugs5382/eslint-config";
-
-// A React component library that wants a11y, Storybook, and doc-coverage:
-export default createESLintConfig({
-  enable: ["eslintA11y", "eslintStorybook", "eslintTypedoc"],
-});
+```json
+{
+  "scripts": {
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix"
+  }
+}
 ```
 
-> ⚠️ **Upgrading from 0.4.x:** `eslintA11y`, `eslintTesting`, and `eslintStorybook` used to be on by default. They are now opt-in — add them to `enable` (and remove them from `disableExtends`) if your project relied on them.
+## 🔁 Moving from the ESLint config
 
-## 🧩 What’s Included?
+This package replaces the ESLint config, published as `@the-rabbit-hole/eslint-config`, which is
+deprecated.
 
-This ESLint config comes pre-bundled with a set of plugins and shareable configs tailored for modern TypeScript + React projects:
+1. Remove ESLint, Prettier and the old config:
 
-### Default plugins (on by default)
+   ```bash
+   npm uninstall eslint prettier @the-rabbit-hole/eslint-config
+   ```
 
-* ⚛️ **[eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react)** — React best practices
-* 🎨 **[eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier)** — Run Prettier as an ESLint rule
-* 🪄 **[eslint-plugin-perfectionist](https://perfectionist.dev)** — Enforces sorting and consistency
-* 🦄 **[eslint-plugin-unicorn](https://github.com/sindresorhus/eslint-plugin-unicorn)** — Massive rules for good code
-* 🟦 **[typescript-eslint](https://typescript-eslint.io)** — TypeScript linting
+2. Install this package and the Oxc tools (see Installation).
+3. Delete `eslint.config.*` and any Prettier config, and add `.oxlintrc.json` and
+   `oxfmt.config.ts` as above. Each opt-in you passed to `createESLintConfig({ enable })` becomes an
+   extra entry in `extends`.
+4. Swap `eslint` for `oxlint` and `prettier` for `oxfmt` in your scripts and CI.
+5. Change `// eslint-disable` comments to `// oxlint-disable` (Oxlint reads both, so this can wait).
 
-### Opt-in plugins (`enable`)
+## 🧩 What's included?
 
-* ♿️ **[eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y)** — Accessibility rules for JSX (`enable: ["eslintA11y"]`)
-* 🧪 **[eslint-plugin-testing-library](https://github.com/testing-library/eslint-plugin-testing-library)** — Testing Library linting (`enable: ["eslintTesting"]`)
-* 📖 **[eslint-plugin-storybook](https://github.com/storybookjs/eslint-plugin-storybook)** — Storybook linting (`enable: ["eslintStorybook"]`)
-* 📚 **[eslint-plugin-typedoc](https://github.com/Nick2bad4u/eslint-plugin-typedoc)** — TypeDoc/TSDoc documentation quality (`enable: ["eslintTypedoc"]`)
+- **Base:** ESLint core, TypeScript with type-aware rules, React, Unicorn, Import and
+  perfectionist's alphabetical sorting.
+- **House rules:** named exports only (config, story and `.d.ts` files are exempt), no
+  `../../../` imports (use a path alias), and arrow functions over function declarations.
+- **Licence headers** stay with [golic](https://github.com/Bugs5382/golic), which every repo runs
+  through its Taskfile.
 
-## 🎨 A note on Prettier
-
-`eslint-plugin-prettier` runs Prettier as an ESLint rule, so the **Prettier version decides the formatting**. To keep `prettier/prettier` verdicts deterministic, this package ships **Prettier as a pinned, exact dependency** rather than a floating peer — the formatter engine only changes in an intentional, changelogged release. You do **not** need to install or pin Prettier yourself; remove any `prettier` peer expectation you previously satisfied for this config.
+[RULES.md](RULES.md) lists every rule that runs through an ESLint plugin, and why.
 
 ## 🤝 Contributing
 
-Contributions are welcome!
-If you have suggestions, improvements, or run into issues, please open a PR or issue.
+Issues and pull requests are welcome. `npm test` lints a small fixture repo with every config, and
+checks oxfmt against Prettier's output.
 
 ## 📜 License
 
-This project is licensed under the **MIT License**.
-You’re free to use it in your own public or private projects.
-
-Made with ❤️ by [@Bugs5382](https://github.com/Bugs5382)
+MIT © Shane

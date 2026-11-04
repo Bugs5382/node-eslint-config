@@ -20,20 +20,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { Linter } from "eslint";
-import prettierPlugin from "eslint-plugin-prettier";
+import { defineConfig } from "vitest/config";
 
-/**
- * ESLint for Prettier Plugin
- * @since 1.0.0
- */
-export const eslintPrettier: Linter.Config = {
-  plugins: {
-    prettier: prettierPlugin,
-  },
-  rules: {
-    "prettier/prettier": ["error"],
-  },
-};
-
-export default eslintPrettier;
+// The fixture repo has its own test file, which is lint input, not a test.
+export default defineConfig({
+  test: { exclude: ["**/node_modules/**", "__tests__/fixtures/**"] },
+});

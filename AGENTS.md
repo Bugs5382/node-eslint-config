@@ -1,62 +1,53 @@
-# AGENTS.md - eslint-config
+# AGENTS.md - node-eslint-config
 
 Guide for AI agents working in this repository. Pair with `CLAUDE.md` (the working agreement and
 hook-enforced rules). Keep this file current when the build, layout, or public API changes.
 
 ## What this is
 
-`@bugs5382/eslint-config` is the shared, flat-config ESLint preset used across Bugs5382 projects
-(and usable publicly). It ships a single factory, `createESLintConfig`,
-that composes a curated set of plugin configs and lets a consumer disable default-on extends, enable
-opt-in extends, and merge/override rules. It is published to npm as dual ESM/CJS with type
-declarations.
+`@bugs5382/node-eslint-config` holds the shared Oxlint and oxfmt configs used across Bugs5382
+projects (and usable publicly). It ships JSON Oxlint configs that a repo `extends` from
+`node_modules`, and an oxfmt settings module a repo re-exports from `oxfmt.config.ts`. There's no
+build and no JavaScript API.
 
-Extends split into two groups (see `baseExtendsMap` / `optInExtendsMap` in `src/index.ts`):
+- `configs/base.json` is the default: ESLint core, TypeScript (type-aware), React, Unicorn, Import,
+  perfectionist and the house rules.
+- `configs/a11y.json`, `testing.json`, `storybook.json` and `typedoc.json` are opt-ins a repo adds
+  to `extends`.
+- `configs/oxfmt.mjs` holds the formatter settings, which print what Prettier 3 printed with its
+  defaults.
 
-- **Default-on** (every consumer): TypeScript, React, unicorn, perfectionist, prettier.
-- **Opt-in** (off unless named in `enable`): jsx-a11y, testing-library, storybook, typedoc — each
-  targets React/test/doc-specific code, so a plain Node library does not inherit them.
+## How the rules are kept
 
-## Using eslint-config
+Every rule the old ESLint config enforced still runs. Rules Oxlint implements natively run natively.
+The rest run through Oxlint's JS plugin support, which loads the ESLint plugin itself: perfectionist,
+testing-library, storybook and typedoc as whole plugins, and the Unicorn and React rules Oxlint
+lacks under the aliases `unicorn-js` and `react-js`. `RULES.md` lists them all.
 
-The public surface is the entry point `@bugs5382/eslint-config`:
-
-- `default` export — the ready-made config (all base extends on).
-- `createESLintConfig(options?)` — the factory. Options:
-  - `disableExtends` — keys of base (default-on) extends to remove.
-  - `enable` — keys of opt-in (default-off) extends to add: `eslintA11y`, `eslintStorybook`,
-    `eslintTesting`, `eslintTypedoc`.
-  - `rules` — rules merged on top of the bundled defaults; a key that collides with a bundled
-    default replaces it and logs an info line.
-- `globalIgnoresArray` — the shared ignore patterns.
-
-Contract: extends load **lazily** so a disabled extend never imports its plugin. This matters for
-`eslintStorybook`, whose plugin imports the `storybook` package at load time — the Storybook extend
-is both lazy and guarded so Node libraries that don't install `storybook` never crash. Preserve that
-laziness when adding extends whose plugins have heavy or optional load-time imports.
+- JS plugins are alpha in Oxlint, so every ESLint plugin is pinned to an exact version in
+  `dependencies`. `eslint` is a dependency too, because some plugins load it.
+- Oxlint's globs take `{a,b}` but not the `@(a|b)` and `?(x)` forms some ESLint presets use, so
+  override `files` use brace forms only.
+- `ignorePatterns` in an extended config are read relative to that config, so the configs carry
+  none; the README gives repos the list to put in their own `.oxlintrc.json`.
+- When Oxlint adds a native version of a `unicorn-js` or `react-js` rule, move it back to the native
+  plugin and drop it from `RULES.md`.
 
 ## Layout
 
-- `src/index.ts` — the factory, the base/opt-in extend maps, default rules, and the default export.
-- `src/eslint*.ts` — one file per bundled plugin config (e.g. `eslintTypescript.ts`,
-  `eslintUnicorn.ts`, `eslintTypedoc.ts`). Each is a thin wrapper around an upstream preset.
-- `src/interopDefault.ts` — unwraps the module namespace the CJS build gets from `require()` of an
-  ESM-only plugin (see the gotcha below).
-- `__tests__/index.test.ts` — unit tests for option wiring (shape of the produced config).
-- `__tests__/package.test.ts` — packs the tarball, checks its file list, and loads it in fresh Node
-  processes through both `import` and `require`, asserting both builds wire up the same plugins.
-- `__tests__/integration.test.ts` — real `ESLint` runs that assert specific plugin rules fire (or
-  don't) for sample code. Note the documented `eslint-plugin-react` + ESLint v10 incompatibility,
-  which keeps the React rule explicitly skipped until upstream ships a fix.
-- `__tests__/package.test.ts` — builds, then runs `npm pack --dry-run --json` and fails if the
-  tarball lacks an entry point or contains a `.map` file. The build keeps source maps in `lib/`
-  for local debugging; the `"!lib/**/*.map"` entry in `files` keeps them out of the package.
+- `configs/` holds everything the package ships.
+- `__tests__/lint.test.ts` installs the configs into a copy of `__tests__/fixtures/consumer` the way
+  a real repo would, runs Oxlint and checks one rule from every plugin fires. The fixture's config is
+  stored as `oxlintrc.fixture.json` so this repo's own lint run doesn't load it.
+- `__tests__/format.test.ts` checks oxfmt prints what Prettier printed for `__tests__/fixtures/format`.
+- `__tests__/package.test.ts` checks the tarball holds `configs/`, the README, the licence and the
+  manifest, and nothing else.
 
-## Build, test, lint
+## Test, lint and format
 
-- Build: `npm run build` (tsdown → `lib/` ESM+CJS+d.ts).
-- Test: `npm test` (vitest). Integration tests run real ESLint; no external services.
-- Lint: `npm run lint` (`eslint`, exits non-zero on any error); `npm run lint:fix` to autofix.
+- Test: `npm test` (vitest).
+- Lint: `npm run lint` (`oxlint`, with this repo's `.oxlintrc.json` extending `configs/base.json`).
+- Format: `npm run format`, or `npm run format:check` in CI.
 - Package hygiene: `npm run lint:npm` (npmPkgJsonLint) and `npx sort-package-json`.
 - License headers: `task golic-run -- ...` (golic verifies the MIT header on every source file in
   CI; the copyright holder is configured as `2026 Shane` in `Taskfile.yaml`).
@@ -72,8 +63,7 @@ sets a `timeout-minutes`.
 - **PR Checks** (`job-pr-checks.yaml`) is one job whose steps are the PR title, PR body, hygiene,
   gitleaks and categorizing-label checks. It is the only workflow that reruns when a PR's title
   or body is edited.
-- **Test** (`action-test.yaml`) builds, tests and lints on three Node versions and against each
-  supported ESLint major. **GoLic** checks license headers. **License Check** checks npm
+- **Test** (`action-test.yaml`) tests, lints and checks formatting on three Node versions. **GoLic** checks license headers. **License Check** checks npm
   dependency licenses, and only runs when `package.json` or the lockfile changes.
 - On `main`, **Release Manager** prepares the changelog and version, and **Label Sync** runs when
   `.github/labels.yml` changes. **Release and Publish** runs Test again and then publishes to npm
@@ -83,16 +73,6 @@ sets a `timeout-minutes`.
 
 - See `CLAUDE.md` for the branch/commit/PR rules; they are enforced by the git hooks in
   `.claude/hooks` (run `bash .claude/hooks/install.sh` once per clone).
-- This package **dogfoods its own built config** via `eslint.config.mjs`, which imports from
-  `./lib/esm`. Run `npm run build` before `npm run lint` after changing `src/`.
-- `eslint-plugin-prettier` formats with whatever Prettier resolves, so Prettier is pinned as an
-  **exact direct dependency** (not a floating peer) to keep formatting deterministic. Bump it
-  deliberately — a Prettier change is a changelogged release.
-- The CJS build turns every plugin import into `require()`. For an ESM-only plugin that has only a
-  default export (eslint-plugin-unicorn), that returns `{ __esModule, default }` and the bundler's
-  interop passes the namespace through as the default, so `plugin.configs` is undefined and
-  `require` of the whole package throws. Wrap such imports in `interopDefault`. The tarball test
-  in `__tests__/package.test.ts` fails if a new plugin needs it.
-- Adding a plugin: create `src/eslint<Name>.ts`, register it in `baseExtendsMap` (default-on) or
-  `optInExtendsMap` (default-off) in `src/index.ts`, add unit + integration coverage, and document
-  it in `README.md`.
+- Run npm with `--ignore-scripts`, as CI does.
+- Changing a rule: edit the config in `configs/`, add a fixture file that breaks it to
+  `__tests__/fixtures/consumer`, and list it in `RULES.md` if it runs through a JS plugin.

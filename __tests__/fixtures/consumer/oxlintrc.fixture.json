@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "./node_modules/@bugs5382/node-eslint-config/configs/base.json",
+    "./node_modules/@bugs5382/node-eslint-config/configs/a11y.json",
+    "./node_modules/@bugs5382/node-eslint-config/configs/storybook.json",
+    "./node_modules/@bugs5382/node-eslint-config/configs/testing.json",
+    "./node_modules/@bugs5382/node-eslint-config/configs/typedoc.json"
+  ],
+  "ignorePatterns": [
+    "dist/**",
+    "lib/**",
+    "coverage/**",
+    "docs/**",
+    "storybook-static/**",
+    ".storybook/**"
+  ]
+}

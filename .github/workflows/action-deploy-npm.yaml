@@ -48,13 +48,10 @@ jobs:
     timeout-minutes: 20
     needs: ['Test']
     steps:
-      - name: Create Directory
-        run: mkdir -p ./lib
-
-      - name: Download the build artifact
+      - name: Download the package artifact
         uses: actions/download-artifact@v8
         with:
-          name: lib
+          name: package
           path: ./
 
       - name: Setup Node.js
