@@ -10,7 +10,7 @@ projects (and usable publicly). It ships JSON Oxlint configs that a repo `extend
 `node_modules`, and an oxfmt settings module a repo re-exports from `oxfmt.config.ts`. There's no
 build and no JavaScript API.
 
-- `configs/base.json` is the default: ESLint core, TypeScript (type-aware), React, Unicorn, Import,
+- `configs/base.json` is the default: ESLint core, TypeScript, React, Unicorn, Import,
   perfectionist and the house rules.
 - `configs/a11y.json`, `testing.json`, `storybook.json` and `typedoc.json` are opt-ins a repo adds
   to `extends`.

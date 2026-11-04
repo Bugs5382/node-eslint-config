@@ -24,10 +24,8 @@ than ESLint and Prettier. You can use it in your own projects too.
 ## 📦 Installation
 
 ```bash
-npm install --save-dev @bugs5382/node-oxlint-config oxlint oxlint-tsgolint oxfmt
+npm install --save-dev @bugs5382/node-oxlint-config oxlint oxfmt
 ```
-
-`oxlint-tsgolint` runs the type-aware TypeScript rules, which the base config turns on.
 
 ## ⚙️ Usage
 
@@ -128,7 +126,7 @@ deprecated.
 
 ## 🧩 What's included?
 
-- **Base:** ESLint core, TypeScript with type-aware rules, React, Unicorn, Import and
+- **Base:** ESLint core, TypeScript, React, Unicorn, Import and
   perfectionist's alphabetical sorting.
 - **House rules:** named exports only (config, story and `.d.ts` files are exempt), no
   `../../../` imports (use a path alias), and arrow functions over function declarations.

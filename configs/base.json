@@ -17,9 +17,6 @@
     "builtin": true,
     "es2026": true
   },
-  "options": {
-    "typeAware": true
-  },
   "rules": {
     "eslint/no-restricted-imports": [
       "error",
