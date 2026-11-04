@@ -1,5 +1,5 @@
 {
-  "name": "@bugs5382/node-eslint-config",
+  "name": "@bugs5382/node-oxlint-config",
   "version": "1.0.0",
   "description": "Shared Oxlint and oxfmt configs for Bugs5382 projects: the house lint rules and Prettier-compatible formatting.",
   "keywords": [
@@ -9,13 +9,13 @@
     "lint",
     "format"
   ],
-  "homepage": "https://github.com/Bugs5382/node-eslint-config#readme",
+  "homepage": "https://github.com/Bugs5382/node-oxlint-config#readme",
   "bugs": {
-    "url": "https://github.com/Bugs5382/node-eslint-config/issues"
+    "url": "https://github.com/Bugs5382/node-oxlint-config/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bugs5382/node-eslint-config.git"
+    "url": "git+https://github.com/Bugs5382/node-oxlint-config.git"
   },
   "license": "MIT",
   "author": "Shane A. Froebel",

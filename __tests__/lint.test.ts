@@ -35,7 +35,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // Lints a small consumer repo that extends every config this package ships,
-// the way a real repo would: through node_modules/@bugs5382/node-eslint-config.
+// the way a real repo would: through node_modules/@bugs5382/node-oxlint-config.
 // Each fixture file breaks one rule from one plugin, so a missing plugin or a
 // JS plugin that fails to load shows up as a missing rule code.
 
@@ -60,7 +60,7 @@ beforeAll(() => {
   mkdirSync(path.join(modules, "@bugs5382"), { recursive: true });
   mkdirSync(path.join(modules, ".bin"));
   // Only what the tarball ships, with the package's own dependencies beside it.
-  const installed = path.join(modules, "@bugs5382", "node-eslint-config");
+  const installed = path.join(modules, "@bugs5382", "node-oxlint-config");
   mkdirSync(installed);
   cpSync(path.join(repoRoot, "configs"), path.join(installed, "configs"), {
     recursive: true,

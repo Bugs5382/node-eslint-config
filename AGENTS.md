@@ -1,11 +1,11 @@
-# AGENTS.md - node-eslint-config
+# AGENTS.md - node-oxlint-config
 
 Guide for AI agents working in this repository. Pair with `CLAUDE.md` (the working agreement and
 hook-enforced rules). Keep this file current when the build, layout, or public API changes.
 
 ## What this is
 
-`@bugs5382/node-eslint-config` holds the shared Oxlint and oxfmt configs used across Bugs5382
+`@bugs5382/node-oxlint-config` holds the shared Oxlint and oxfmt configs used across Bugs5382
 projects (and usable publicly). It ships JSON Oxlint configs that a repo `extends` from
 `node_modules`, and an oxfmt settings module a repo re-exports from `oxfmt.config.ts`. There's no
 build and no JavaScript API.

@@ -1,9 +1,9 @@
-# node-eslint-config 🧹
+# node-oxlint-config 🧹
 
 > 🪄 Shared Oxlint and oxfmt configs used across Bugs5382 projects.
 
-![npm version](https://img.shields.io/npm/v/@bugs5382/node-eslint-config?style=for-the-badge&logo=npm&label=version)
-![npm downloads](https://img.shields.io/npm/dm/@bugs5382/node-eslint-config?style=for-the-badge&logo=npm&label=downloads)
+![npm version](https://img.shields.io/npm/v/@bugs5382/node-oxlint-config?style=for-the-badge&logo=npm&label=version)
+![npm downloads](https://img.shields.io/npm/dm/@bugs5382/node-oxlint-config?style=for-the-badge&logo=npm&label=downloads)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 ## ✨ Overview
@@ -24,7 +24,7 @@ than ESLint and Prettier. You can use it in your own projects too.
 ## 📦 Installation
 
 ```bash
-npm install --save-dev @bugs5382/node-eslint-config oxlint oxlint-tsgolint oxfmt
+npm install --save-dev @bugs5382/node-oxlint-config oxlint oxlint-tsgolint oxfmt
 ```
 
 `oxlint-tsgolint` runs the type-aware TypeScript rules, which the base config turns on.
@@ -37,7 +37,7 @@ Create `.oxlintrc.json`, extend the base config, and list what Oxlint should ski
 
 ```json
 {
-  "extends": ["./node_modules/@bugs5382/node-eslint-config/configs/base.json"],
+  "extends": ["./node_modules/@bugs5382/node-oxlint-config/configs/base.json"],
   "ignorePatterns": [
     "dist/**",
     "lib/**",
@@ -67,8 +67,8 @@ A React project should also tell the React rules its version:
 ```json
 {
   "extends": [
-    "./node_modules/@bugs5382/node-eslint-config/configs/base.json",
-    "./node_modules/@bugs5382/node-eslint-config/configs/a11y.json"
+    "./node_modules/@bugs5382/node-oxlint-config/configs/base.json",
+    "./node_modules/@bugs5382/node-oxlint-config/configs/a11y.json"
   ],
   "settings": { "react": { "version": "19.2" } }
 }
@@ -81,13 +81,13 @@ Your own `rules`, `overrides` and `ignorePatterns` go in the same file and win o
 Create `oxfmt.config.ts`:
 
 ```ts
-export { default } from "@bugs5382/node-eslint-config/oxfmt";
+export { default } from "@bugs5382/node-oxlint-config/oxfmt";
 ```
 
 To change a setting, spread the shared one:
 
 ```ts
-import shared from "@bugs5382/node-eslint-config/oxfmt";
+import shared from "@bugs5382/node-oxlint-config/oxfmt";
 
 export default { ...shared, printWidth: 100 };
 ```
