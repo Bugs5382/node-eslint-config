@@ -47,6 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: ['Test']
+    # npm trusted publishing: GitHub's OIDC token proves this workflow is the
+    # package's configured publisher, so no npm token is stored anywhere, and
+    # npm adds provenance on its own.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Download the package artifact
         uses: actions/download-artifact@v8
@@ -60,10 +66,9 @@ jobs:
           node-version: lts/*
           registry-url: 'https://registry.npmjs.org/'
 
+      # Trusted publishing needs npm 11.5.1 or newer.
+      - name: Update npm
+        run: npm install --global --ignore-scripts npm@^11.5.1
+
       - name: Publish to npm
-        uses: JS-DevTools/npm-publish@v4
-        with:
-          provenance: true
-          access: public
-          ignore-scripts: true
-          token: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --ignore-scripts
