@@ -1,5 +1,17 @@
 # @bugs5382/node-oxlint-config
 
+## v1.0.0 - 2026-11-04
+
+### What Changed 👀
+
+#### 💥 Breaking Changes
+
+- feat!: switch the shared config from ESLint and Prettier to Oxlint and oxfmt @Bugs5382 (#91)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-oxlint-config/compare/v0.7.0...v1.0.0
+
 ## v0.7.0 - 2026-09-29
 
 ### What Changed 👀
