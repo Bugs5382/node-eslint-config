@@ -1,6 +1,6 @@
 {
   "name": "@bugs5382/node-oxlint-config",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Shared Oxlint and oxfmt configs for Bugs5382 projects: the house lint rules and Prettier-compatible formatting.",
   "keywords": [
     "oxlint",
@@ -71,7 +71,7 @@
   "peerDependencies": {
     "oxfmt": "^0.76.0",
     "oxlint": "^1.91.0",
-    "oxlint-tsgolint": ">=7.0.2005"
+    "oxlint-tsgolint": "^7.0.2005"
   },
   "peerDependenciesMeta": {
     "oxfmt": {
@@ -79,6 +79,9 @@
     }
   },
   "packageManager": "npm@11.18.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "publishConfig": {
     "access": "public"
   }

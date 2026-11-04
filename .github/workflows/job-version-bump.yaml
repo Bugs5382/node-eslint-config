@@ -19,91 +19,85 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 name: Release Manager
-
+# Runs on every push to main, BEFORE the maintainer publishes the GitHub Release.
+# Anticipates the next version from release-drafter, bumps package.json, writes
+# CHANGELOG.md via the Bugs5382 changelog action, and pushes a [skip ci] commit
+# so main always carries the prepped version + changelog. Nothing tags here -
+# the maintainer publishes the Release manually, which creates the tag and
+# triggers the npm publish workflow.
 on:
   push:
     branches:
       - main
+  # Run by hand to redraft, such as after the old releases were removed.
+  workflow_dispatch:
 
-# One run per branch, and it is left to finish. This one publishes,
-# and a publish interrupted half way through is worse than a publish
-# that waited.
+# One run per branch, and it is left to finish.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 permissions:
   contents: write
   pull-requests: write
-  packages: write
-  id-token: write
 
 jobs:
   Update_Version:
     name: 🚀 Update Changelog & Prep Release
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
+      - name: Check release prerequisites
+        shell: bash
+        env:
+          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+        run: |
+          if [ -z "$APP_PRIVATE_KEY" ]; then
+            echo "::error title=Release setup required::APP_PRIVATE_KEY is not set."
+            echo "One-time setup required before the Release Manager works (per repo):"
+            echo "  1. Install the Bugs5382 release GitHub App on this repository."
+            echo "  2. Add the APP_PRIVATE_KEY secret and the APP_CLIENT_ID variable, org or repo level."
+            echo "  3. Add the release App as a bypass actor on the branch ruleset, so the"
+            echo "     [skip ci] changelog push to main is not blocked."
+            echo "  Re-check this list whenever the release method is updated."
+            exit 1
+          fi
+          echo "Release prerequisites present."
+
       - name: Create GitHub App token
         id: app-token
-        uses: actions/create-github-app-token@v3.2.0
+        uses: actions/create-github-app-token@v3.1.1
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: 📂 Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
 
-      # A dry run writes nothing: it only reports the version the labels
-      # resolve to, so the next step can correct it before the draft exists.
-      - name: 🔍 Release Drafter (Resolve Version)
-        id: resolve
-        uses: release-drafter/release-drafter@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          dry-run: true
-
-      # release-drafter turns the `breaking` label into a major bump whatever
-      # the current version is, so a breaking change on 0.x would jump to
-      # 1.0.0. Below 1.0.0 a breaking change moves the minor number instead.
-      # This lives here rather than in release-drafter.yml because that file
-      # is overwritten by the hub governance sync.
-      - name: 🔢 Keep 0.x Breaking Changes on a Minor Bump
-        id: version
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RESOLVED: ${{ steps.resolve.outputs.resolved_version }}
-        run: |
-          version="$RESOLVED"
-          last="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name 2>/dev/null || true)"
-          last="${last#v}"
-          echo "Last published release: ${last:-none}; release-drafter resolved: ${RESOLVED:-none}"
-          if [ -n "$last" ] && [ -n "$RESOLVED" ]; then
-            IFS=. read -r last_major last_minor _ <<< "$last"
-            resolved_major="${RESOLVED%%.*}"
-            if [ "$last_major" = 0 ] && [ "$resolved_major" != 0 ]; then
-              version="0.$((last_minor + 1)).0"
-              echo "Below 1.0.0: holding the major bump ($RESOLVED) to a minor bump ($version)."
-            fi
-          fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
       - name: 📝 Release Drafter (Anticipate Version)
         id: drafter
-        uses: release-drafter/release-drafter@v7
+        uses: Bugs5382/release-drafter-action@de0c4559d69039b8b371ef951b62a2532ad3593f # v1.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          version: ${{ steps.version.outputs.version }}
+          config: ${{ vars.RELEASE_DRAFTER_CONFIG }}
+          extends: ${{ github.repository_owner == 'Bugs5382' && 'Bugs5382/.github@main' || '' }}
+          # The package restarts at v1.0.0 under its new name: the first release
+          # lists only what was merged after this commit, the last one of the
+          # ESLint config. It only applies while there's no earlier release.
+          since: d9fd88009682e8882d380990ef2a6bda079f7292
 
-      - name: Detect releasable changes
+      - name: 🔎 Detect releasable changes
         id: releasable
         env:
           BODY: ${{ steps.drafter.outputs.body }}
         run: |
-          # On a push, skip the prep when release-drafter found no PR entries
-          # (nothing releasable) so the manifest does not drift ahead.
+          # release-drafter's body lists the categorized PRs since the last
+          # release. With nothing to release (every change excluded, e.g.
+          # skip-changelog), it carries no PR entries -- skip the bump/changelog/
+          # commit so the manifest stays at the published version instead of
+          # drifting ahead.
           if printf '%s' "$BODY" | grep -qE '\(#[0-9]+\)'; then
             echo "yes=true" >> "$GITHUB_OUTPUT"
           else
@@ -117,16 +111,11 @@ jobs:
 
       - name: 📤 Run Changelog Action
         if: steps.releasable.outputs.yes == 'true'
-        env:
-          LOG_LEVEL: debug
-          LOG_FORMAT: text
-          RELEASE_NOTES: >-
-            ${{ steps.drafter.outputs.body }}
-          RELEASE_VERSION: v${{ steps.drafter.outputs.resolved_version }}
-        uses: bugs5382/changelog-updater-action@v0.3.2
+        uses: bugs5382/changelog-updater-action@v1
         with:
-          tag: ${{ env.RELEASE_VERSION }}
-          notes: ${{ env.RELEASE_NOTES }}
+          tag: v${{ steps.drafter.outputs.resolved_version }}
+          notes: ${{ steps.drafter.outputs.body }}
+          path: .
           diff: 'true'
 
       - name: 📤 Commit and Push Version Update
@@ -134,6 +123,8 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(pre-release): v${{ steps.drafter.outputs.resolved_version }} [skip ci]"
+          # Commit as the triggering owner, not github-actions[bot]; the push
+          # still uses the release App token to bypass the [skip ci] rule.
           commit_user_name: ${{ github.actor }}
           commit_user_email: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
           commit_author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
