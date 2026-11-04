@@ -83,10 +83,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           config: ${{ vars.RELEASE_DRAFTER_CONFIG }}
           extends: ${{ github.repository_owner == 'Bugs5382' && 'Bugs5382/.github@main' || '' }}
-          # The package restarts at v1.0.0 under its new name: the first release
-          # lists only what was merged after this commit, the last one of the
-          # ESLint config. It only applies while there's no earlier release.
-          since: d9fd88009682e8882d380990ef2a6bda079f7292
 
       - name: 🔎 Detect releasable changes
         id: releasable
