@@ -78,7 +78,7 @@ jobs:
 
       - name: 📝 Release Drafter (Anticipate Version)
         id: drafter
-        uses: Bugs5382/release-drafter-action@de0c4559d69039b8b371ef951b62a2532ad3593f # v1.0.1
+        uses: Bugs5382/release-drafter-action@a4a5c9821f81b848886d4986a2320299d4ca13cc # v1.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config: ${{ vars.RELEASE_DRAFTER_CONFIG }}
