@@ -1,0 +1,24 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx,mts,cts}"],
+      "rules": {
+        "typedoc/no-duplicate-param-tags": "error",
+        "typedoc/no-duplicate-type-param-tags": "error",
+        "typedoc/no-empty-example-tag": "error",
+        "typedoc/no-empty-remarks-tag": "error",
+        "typedoc/no-empty-see-tag": "error",
+        "typedoc/no-extra-param-tags": "error",
+        "typedoc/no-malformed-inline-links": "error",
+        "typedoc/no-unknown-tags": "error",
+        "typedoc/prefer-package-documentation-tag": "error",
+        "typedoc/prefer-type-param-tag": "error",
+        "typedoc/require-deprecated-tag-description": "error",
+        "typedoc/require-exported-doc-comment": "error",
+        "typedoc/require-exported-doc-comment-description": "error",
+        "typedoc/typedoc-config-requires-options": "error"
+      },
+      "jsPlugins": ["eslint-plugin-typedoc"]
+    }
+  ]
+}

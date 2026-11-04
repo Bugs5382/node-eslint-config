@@ -20,29 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { Linter } from "eslint";
-import { createRequire } from "node:module";
+import shared from "./configs/oxfmt.mjs";
 
-const requirePlugin = createRequire(import.meta.url);
-
-/**
- * ESLint config for Storybook, loaded lazily and treated as optional.
- *
- * @remarks eslint-plugin-storybook imports the `storybook` package at module
- * load time. The plugin is required lazily (only when this extend is resolved)
- * AND guarded: the default export resolves every extend at module load, so a
- * project without `storybook` would otherwise crash on `import` even when it
- * disables this extend. When `storybook` is absent the Storybook config is
- * skipped instead, so Node libraries never need to install it.
- * @since 1.0.0
- */
-const eslintStorybook = (): Linter.Config[] => {
-  try {
-    const storybook = requirePlugin("eslint-plugin-storybook");
-    return storybook.configs["flat/recommended"];
-  } catch {
-    return [];
-  }
+// The shared settings, plus this repo's own generated docs and test inputs.
+export default {
+  ...shared,
+  ignorePatterns: [
+    ...shared.ignorePatterns,
+    "docs/**",
+    "__tests__/fixtures/**",
+  ],
 };
-
-export default eslintStorybook;

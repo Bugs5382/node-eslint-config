@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./configs/base.json"],
+  "ignorePatterns": [
+    "docs/**",
+    "lib/**",
+    "coverage/**",
+    "__tests__/fixtures/**"
+  ],
+  "overrides": [
+    {
+      "files": ["configs/oxfmt.mjs", "configs/oxfmt.d.mts"],
+      "rules": {
+        "import/no-default-export": "off"
+      }
+    }
+  ]
+}

@@ -17,5 +17,6 @@
     "incremental": false,
     "types": ["node"]
   },
-  "include": ["src/**/*"]
+  "include": ["__tests__/**/*", "configs/**/*", "*.ts"],
+  "exclude": ["__tests__/fixtures/**"]
 }

@@ -20,33 +20,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
-import { describe, expect, it } from "vitest";
-
-import { interopDefault } from "../src/interopDefault";
-
-describe("interopDefault", () => {
-  const plugin = { configs: { recommended: {} }, rules: {} };
-
-  it("unwraps a module namespace returned by require() of an ESM module", () => {
-    expect(interopDefault({ __esModule: true, default: plugin })).toBe(plugin);
-  });
-
-  it("passes a plugin object through unchanged", () => {
-    expect(interopDefault(plugin)).toBe(plugin);
-  });
-
-  it("leaves a plugin that happens to have a default key alone", () => {
-    const withDefault = { ...plugin, default: "not a namespace" };
-    expect(interopDefault(withDefault)).toBe(withDefault);
-  });
-
-  it("leaves a namespace without a default export alone", () => {
-    const namespace = { __esModule: true, configs: {} };
-    expect(interopDefault(namespace)).toBe(namespace);
-  });
-
-  it("passes non-object values through", () => {
-    expect(interopDefault("plugin")).toBe("plugin");
-    expect(interopDefault(0)).toBe(0);
-  });
-});
+/** Formatter settings that match Prettier 3 with its default options. */
+declare const config: {
+  ignorePatterns: string[];
+  printWidth: number;
+  sortPackageJson: boolean;
+};
+export default config;

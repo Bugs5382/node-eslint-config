@@ -28,3 +28,5 @@
 **/docs/**
 /.idea/**
 /.husky/**
+# Lint and format fixtures are inputs whose exact text the tests check.
+/__tests__/fixtures/**

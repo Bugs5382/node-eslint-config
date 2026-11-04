@@ -1,95 +1,82 @@
 {
-  "name": "@bugs5382/eslint-config",
+  "name": "@bugs5382/node-oxlint-config",
   "version": "1.0.0",
-  "description": "A shared ESLint config for Bugs5382 projects, usable publicly.",
+  "description": "Shared Oxlint and oxfmt configs for Bugs5382 projects: the house lint rules and Prettier-compatible formatting.",
   "keywords": [
-    "eslint",
-    "eslint-config"
+    "oxlint",
+    "oxlint-config",
+    "oxfmt",
+    "lint",
+    "format"
   ],
-  "homepage": "https://github.com/Bugs5382/node-eslint-config#readme",
+  "homepage": "https://github.com/Bugs5382/node-oxlint-config#readme",
   "bugs": {
-    "url": "https://github.com/Bugs5382/node-eslint-config/issues"
+    "url": "https://github.com/Bugs5382/node-oxlint-config/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bugs5382/node-eslint-config.git"
+    "url": "git+https://github.com/Bugs5382/node-oxlint-config.git"
   },
   "license": "MIT",
   "author": "Shane A. Froebel",
   "type": "module",
   "exports": {
-    ".": {
-      "import": {
-        "types": "./lib/esm/index.d.mts",
-        "default": "./lib/esm/index.mjs"
-      },
-      "require": {
-        "types": "./lib/cjs/index.d.cts",
-        "default": "./lib/cjs/index.cjs"
-      }
-    }
+    "./oxfmt": {
+      "types": "./configs/oxfmt.d.mts",
+      "default": "./configs/oxfmt.mjs"
+    },
+    "./configs/*": "./configs/*",
+    "./package.json": "./package.json"
   },
-  "main": "./lib/cjs/index.cjs",
-  "module": "./lib/esm/index.mjs",
-  "types": "./lib/esm/index.d.mts",
   "files": [
-    "lib/",
-    "!lib/**/*.map",
+    "configs/",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsdown",
-    "build:local": "tsdown && eslint --fix && npm run pack",
-    "docs": "typedoc",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "lint:npm": "npmPkgJsonLint .",
     "lint:package": "npx sort-package-json",
     "pack": "npm pack",
     "test": "vitest run",
-    "test:coverage": "vitest --coverage",
     "test:watch": "vitest",
-    "typedoc": "typedoc",
-    "typedoc:watch": "typedoc -watch",
-    "update": "npx npm-check-updates -u --peer && npm install --legacy-peer-deps"
+    "update": "npx npm-check-updates -u --peer && npm install --legacy-peer-deps --ignore-scripts"
   },
   "dependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-perfectionist": "^5.9.1",
-    "eslint-plugin-prettier": "^5.5.6",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-sort-class-members": "^1.22.1",
-    "eslint-plugin-storybook": "^10.4.6",
-    "eslint-plugin-testing-library": "^7.16.2",
-    "eslint-plugin-typedoc": "^1.3.5",
-    "eslint-plugin-unicorn": "^65.0.1",
-    "prettier": "3.9.4",
-    "typescript-eslint": "^8.62.1"
+    "eslint": "10.14.0",
+    "eslint-plugin-perfectionist": "5.13.0",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-storybook": "10.6.5",
+    "eslint-plugin-testing-library": "7.16.2",
+    "eslint-plugin-typedoc": "1.3.6",
+    "eslint-plugin-unicorn": "65.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.0",
     "@commitlint/config-conventional": "^21.2.0",
-    "@shipgirl/typedoc-plugin-versions": "^0.3.2",
-    "@types/eslint-plugin-jsx-a11y": "^6.10.1",
-    "@types/eslint-plugin-tailwindcss": "^3.17.0",
     "@types/node": "^26.0.1",
-    "@vitest/coverage-v8": "^4.1.9",
-    "eslint": "^10.6.0",
-    "globals": "^17.7.0",
     "npm": "^11.18.0",
     "npm-package-json-lint": "^10.4.1",
     "npm-package-json-lint-config-default": "^9.0.1",
+    "oxfmt": "0.76.0",
+    "oxlint": "1.91.0",
+    "oxlint-tsgolint": "7.0.2005",
     "sort-package-json": "^4.0.0",
-    "storybook": "^10.4.6",
-    "tsdown": "^0.22.3",
-    "typedoc": "^0.28.19",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
-    "eslint": "^9.39.4 || ^10.0.0"
+    "oxfmt": "^0.76.0",
+    "oxlint": "^1.91.0",
+    "oxlint-tsgolint": ">=7.0.2005"
+  },
+  "peerDependenciesMeta": {
+    "oxfmt": {
+      "optional": true
+    }
   },
   "packageManager": "npm@11.18.0",
   "publishConfig": {
