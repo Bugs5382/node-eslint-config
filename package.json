@@ -18,7 +18,7 @@
     "url": "git+https://github.com/Bugs5382/node-oxlint-config.git"
   },
   "license": "MIT",
-  "author": "Shane A. Froebel",
+  "author": "Shane",
   "type": "module",
   "exports": {
     "./oxfmt": {
