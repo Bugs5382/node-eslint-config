@@ -67,7 +67,10 @@ sets a `timeout-minutes`.
   dependency licenses, and only runs when `package.json` or the lockfile changes.
 - On `main`, **Release Manager** prepares the changelog and version, and **Label Sync** runs when
   `.github/labels.yml` changes. **Release and Publish** runs Test again and then publishes to npm
-  when a release is published.
+  when a release is published. It publishes through npm trusted publishing (OIDC): npm trusts
+  `action-deploy-npm.yaml` in this repo as the package's publisher, so there's no npm token in the
+  repo, and npm adds provenance. The publisher is set in the package's npm settings under Trusted
+  publishing, and a renamed workflow file needs it updated there too.
 
 ## Conventions and gotchas
 
