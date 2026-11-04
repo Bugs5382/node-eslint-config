@@ -109,20 +109,33 @@ The shared settings leave alone the files the project-template governance sync o
 ## 🔁 Moving from the ESLint config
 
 This package replaces the ESLint config, published as `@the-rabbit-hole/eslint-config`, which is
-deprecated.
+no longer on npm.
 
-1. Remove ESLint, Prettier and the old config:
+1. Remove ESLint, Prettier and the old config, then delete `node_modules` and the lockfile so the
+   next install starts clean:
 
    ```bash
-   npm uninstall eslint prettier @the-rabbit-hole/eslint-config
+   npm pkg delete devDependencies.eslint devDependencies.prettier "devDependencies.@the-rabbit-hole/eslint-config"
+   rm -rf node_modules package-lock.json
    ```
 
-2. Install this package and the Oxc tools (see Installation).
+   Also remove any ESLint plugins and configs that only the old config used (`typescript-eslint`,
+   `@eslint/js`, `eslint-plugin-*`, `eslint-config-prettier`, `globals`).
+
+2. Install this package and the Oxc tools (see Installation). The install writes a fresh lockfile.
 3. Delete `eslint.config.*` and any Prettier config, and add `.oxlintrc.json` and
    `oxfmt.config.ts` as above. Each opt-in you passed to `createESLintConfig({ enable })` becomes an
    extra entry in `extends`.
 4. Swap `eslint` for `oxlint` and `prettier` for `oxfmt` in your scripts and CI.
-5. Change `// eslint-disable` comments to `// oxlint-disable` (Oxlint reads both, so this can wait).
+5. Rename the rules that moved to an alias. The unicorn and React rules Oxlint has no native version
+   of run under `unicorn-js/` and `react-js/` (the full list is in [RULES.md](RULES.md)), so a
+   comment like `// eslint-disable-next-line unicorn/prefer-https` or an override of
+   `unicorn/prevent-abbreviations` in your `.oxlintrc.json` has to use the `unicorn-js/` name.
+6. Change `// eslint-disable` comments to `// oxlint-disable` (Oxlint reads both, so this can wait).
+
+If `oxlint` stops with `Cannot find module 'eslint/package.json'`, the lockfile still carries the
+old ESLint layout: npm nested this package's `eslint` while the ESLint plugins it loads stayed at the
+top. Redo step 1 and install again. Don't add `eslint` to your own `devDependencies` to get past it.
 
 ## 🧩 What's included?
 
