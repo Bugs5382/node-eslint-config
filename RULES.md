@@ -6,7 +6,7 @@ JS plugin support, which loads the original ESLint plugin.
 
 ## Native plugins
 
-ESLint core, TypeScript (including type-aware rules), React, jsx-a11y, Unicorn and Import run on
+ESLint core, TypeScript, React, jsx-a11y, Unicorn and Import run on
 Oxlint's native plugins, with the same severities and options the ESLint config used. The list came
 from `@oxlint/migrate`, checked rule by rule.
 

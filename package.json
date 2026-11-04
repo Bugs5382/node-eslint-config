@@ -1,6 +1,6 @@
 {
   "name": "@bugs5382/node-oxlint-config",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Shared Oxlint and oxfmt configs for Bugs5382 projects: the house lint rules and Prettier-compatible formatting.",
   "keywords": [
     "oxlint",
@@ -18,7 +18,7 @@
     "url": "git+https://github.com/Bugs5382/node-oxlint-config.git"
   },
   "license": "MIT",
-  "author": "Shane A. Froebel",
+  "author": "Shane",
   "type": "module",
   "exports": {
     "./oxfmt": {
@@ -46,7 +46,7 @@
     "update": "npx npm-check-updates -u --peer && npm install --legacy-peer-deps --ignore-scripts"
   },
   "dependencies": {
-    "eslint": "10.14.0",
+    "eslint": "9.39.5",
     "eslint-plugin-perfectionist": "5.13.0",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-storybook": "10.6.5",
@@ -63,15 +63,13 @@
     "npm-package-json-lint-config-default": "^9.0.1",
     "oxfmt": "0.76.0",
     "oxlint": "1.91.0",
-    "oxlint-tsgolint": "7.0.2005",
     "sort-package-json": "^4.0.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
     "oxfmt": "^0.76.0",
-    "oxlint": "^1.91.0",
-    "oxlint-tsgolint": ">=7.0.2005"
+    "oxlint": "^1.91.0"
   },
   "peerDependenciesMeta": {
     "oxfmt": {
@@ -79,6 +77,9 @@
     }
   },
   "packageManager": "npm@11.18.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "publishConfig": {
     "access": "public"
   }

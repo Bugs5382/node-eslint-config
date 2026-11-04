@@ -58,7 +58,6 @@ beforeAll(() => {
   );
   const modules = path.join(work, "node_modules");
   mkdirSync(path.join(modules, "@bugs5382"), { recursive: true });
-  mkdirSync(path.join(modules, ".bin"));
   // Only what the tarball ships, with the package's own dependencies beside it.
   const installed = path.join(modules, "@bugs5382", "node-oxlint-config");
   mkdirSync(installed);
@@ -69,7 +68,6 @@ beforeAll(() => {
     path.join(repoRoot, "node_modules"),
     path.join(installed, "node_modules"),
   );
-  symlinkSync(bin("tsgolint"), path.join(modules, ".bin", "tsgolint"));
   let output = "";
   try {
     // No paths: the repo's own ignorePatterns and .gitignore decide what's linted.
