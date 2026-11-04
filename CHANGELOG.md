@@ -1,5 +1,17 @@
 # @bugs5382/node-oxlint-config
 
+## v1.0.1 - 2026-11-04
+
+### What Changed 👀
+
+#### 📄 Documentation
+
+- docs: regenerate the lockfile and rename aliased rules when moving from ESLint @Bugs5382 (#98)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-oxlint-config/compare/v1.0.0...v1.0.1
+
 ## v1.0.0 - 2026-11-04
 
 ### What Changed 👀
