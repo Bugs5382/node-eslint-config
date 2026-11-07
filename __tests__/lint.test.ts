@@ -116,6 +116,14 @@ describe("a repo that extends every config", () => {
     ).toEqual([]);
   });
 
+  it("leaves hex digit casing to the formatter", () => {
+    // oxfmt prints 0xff in lowercase; unicorn/number-literal-case wants 0xFF, so
+    // the rule is off and the file passes both tools.
+    expect(codes.get("src/hexLiteral.ts") ?? []).not.toContain(
+      "unicorn(number-literal-case)",
+    );
+  });
+
   it("lets config and story files use a default export", () => {
     expect(codes.get("src/Button.stories.tsx") ?? []).not.toContain(
       "import(no-default-export)",

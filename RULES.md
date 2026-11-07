@@ -79,6 +79,9 @@ version, the rule moves back to the native plugin.
 
 - `prettier/prettier` is gone: oxfmt does the formatting, with settings that print what Prettier
   printed (see the README).
+- `unicorn/number-literal-case` is off: it wants uppercase hex digits (`0xFF`) while oxfmt prints
+  them lowercase (`0xff`), the same as Prettier, so no file could pass both. In the ESLint config,
+  eslint-config-prettier turned it off; the formatter owns number casing.
 - Two house rules are new: `import/no-default-export` (named exports; config, story and `.d.ts`
   files are exempt) and `eslint/no-restricted-imports` against `../../../` imports (use a path
   alias).
