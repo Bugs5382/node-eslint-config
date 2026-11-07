@@ -1,5 +1,17 @@
 # @bugs5382/node-oxlint-config
 
+## v1.0.2 - 2026-11-07
+
+### What Changed 👀
+
+#### 🐛 Bug Fixes
+
+- fix: turn off unicorn/number-literal-case, which fights oxfmt over hex casing @Bugs5382 (#100)
+
+### Extra
+
+**Full Changelog**: https://github.com/Bugs5382/node-oxlint-config/compare/v1.0.1...v1.0.2
+
 ## v1.0.1 - 2026-11-04
 
 ### What Changed 👀

@@ -1,6 +1,6 @@
 {
   "name": "@bugs5382/node-oxlint-config",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Shared Oxlint and oxfmt configs for Bugs5382 projects: the house lint rules and Prettier-compatible formatting.",
   "keywords": [
     "oxlint",
