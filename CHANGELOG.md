@@ -1,6 +1,6 @@
 # @bugs5382/node-oxlint-config
 
-## v1.0.2 - 2026-11-07
+## v1.0.2 - 2026-11-10
 
 ### What Changed 👀
 
